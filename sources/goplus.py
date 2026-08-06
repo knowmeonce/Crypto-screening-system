@@ -39,9 +39,46 @@ def check_contract_security(chain: str, token_address: str) -> dict:
         "is_open_source": token_data.get("is_open_source"),
         "lp_holder_count": token_data.get("lp_holder_count"),
         "lp_total_supply": token_data.get("lp_total_supply"),
+        "holder_count": token_data.get("holder_count"),  # total holders, feeds the meme-coin holder-growth-rate score
         "top_10_holder_percent": token_data.get("top_10_holder_percent"),  # cross-check vs Blockscout
         "raw": token_data,  # keep raw payload for anything the rubric adds later
     }
+
+
+def summarize_lp_lock(security_data: dict) -> dict:
+    """
+    Percent of the LP token supply held by locked positions, from
+    GoPlus's own lp_holders list (each entry carries is_locked and,
+    for locked positions, a locked_detail amount). Not exercised by
+    the WETH smoke test (WETH has no LP token of its own) — spot-check
+    this against a real DEX-listed token's response before trusting it
+    in production scoring.
+
+    Returns insufficient_data=True (never a silent 0%) when GoPlus
+    didn't return LP holder data at all — most likely a token that
+    isn't recognized as having a standard LP pool.
+    """
+    raw = security_data.get("raw", {})
+    lp_holders = raw.get("lp_holders")
+    lp_total_supply = security_data.get("lp_total_supply")
+
+    if not lp_holders or not lp_total_supply:
+        return {"lp_locked_pct": None, "insufficient_data": True}
+
+    try:
+        total = float(lp_total_supply)
+        locked = sum(
+            float(h.get("balance", 0))
+            for h in lp_holders
+            if str(h.get("is_locked")) == "1"
+        )
+    except (TypeError, ValueError):
+        return {"lp_locked_pct": None, "insufficient_data": True}
+
+    if total <= 0:
+        return {"lp_locked_pct": None, "insufficient_data": True}
+
+    return {"lp_locked_pct": round((locked / total) * 100, 2), "insufficient_data": False}
 
 
 def evaluate_hard_filters(security_data: dict) -> dict:
@@ -72,6 +109,14 @@ def evaluate_hard_filters(security_data: dict) -> dict:
             failures.append("top-10 concentration unparseable")
     else:
         failures.append("top-10 concentration unknown")
+
+    if HARD_FILTERS["require_lp_lock"]:
+        lp_lock = summarize_lp_lock(security_data)
+        min_locked = HARD_FILTERS.get("min_lp_locked_pct", 50.0)
+        if lp_lock["insufficient_data"]:
+            failures.append("LP lock status unknown")
+        elif lp_lock["lp_locked_pct"] < min_locked:
+            failures.append(f"LP locked {lp_lock['lp_locked_pct']:.1f}% below required {min_locked:.0f}%")
 
     return {
         "passed": len(failures) == 0,
