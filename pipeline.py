@@ -67,9 +67,14 @@ def collect_token_data(
         record["errors"]["goplus"] = str(e)
 
     # --- Holder concentration ---
+    # total_supply is sourced from Blockscout itself, not from the
+    # CoinGecko market record above — it must be in the same raw,
+    # undivided units as Blockscout's holder `value` field, which a
+    # decimal-adjusted figure like circulating_supply is not. See
+    # blockscout.get_token_supply_raw()'s docstring.
     try:
         holders = blockscout.get_top_holders(chain, token_address)
-        total_supply = (record.get("market") or {}).get("circulating_supply")
+        total_supply = blockscout.get_token_supply_raw(chain, token_address)
         record["concentration"] = blockscout.compute_concentration(holders, total_supply, lp_addresses)
     except Exception as e:
         record["concentration"] = None
