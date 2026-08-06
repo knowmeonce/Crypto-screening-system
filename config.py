@@ -177,3 +177,10 @@ HISTORY_DIR = f"{DATA_DIR}/history"
 WATCHLIST_PATH = f"{DATA_DIR}/watchlist.json"
 LATEST_PATH = f"{DATA_DIR}/latest.json"
 BUCKET_PROPOSALS_PATH = f"{DATA_DIR}/bucket_proposals.json"
+ALERTS_PATH = f"{DATA_DIR}/alerts.json"
+
+# Generated dashboard output — built fresh by the Actions workflow and
+# deployed straight to Pages, never committed to git (unlike data/,
+# which the workflow does commit back, since it's the trend history
+# tomorrow's run depends on).
+SITE_DIR = "site"
