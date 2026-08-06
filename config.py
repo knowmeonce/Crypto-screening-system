@@ -144,6 +144,34 @@ GLOSSARY = {
     "narrative tailwind": "A bonus added to a coin's score for being in a hot, not-yet-priced-in bucket — a tie-breaker on top of the core score, never a substitute for it.",
 }
 
+# CoinGecko's own asset-platform slugs, for the contract->id lookup —
+# NOT the same strings as our internal chain keys in every case (e.g.
+# Arbitrum is "arbitrum-one" here, Polygon is "polygon-pos", BSC is
+# "binance-smart-chain"). Verify against a live discovery run before
+# trusting these blindly; CoinGecko has occasionally renamed platform
+# slugs.
+COINGECKO_PLATFORM_IDS = {
+    "ethereum": "ethereum",
+    "base": "base",
+    "arbitrum": "arbitrum-one",
+    "polygon": "polygon-pos",
+    "bsc": "binance-smart-chain",
+}
+
+# Watchlist size cap — daily re-screening costs 5 API calls per coin,
+# so an unbounded watchlist eventually blows through free-tier rate
+# limits. When over the cap, the lowest-scoring, least-recently-strong
+# entries are dropped first (see daily.py's prune step).
+MAX_WATCHLIST_SIZE = 150
+
+MIN_BUCKET_PROPOSAL_SIZE = 3
+
+# Small pause between coins in the daily run — 5 free-tier API calls
+# per coin adds up fast against CoinGecko's unauthenticated rate
+# limit. Doesn't guarantee no 429s at a full 150-coin watchlist, but
+# meaningfully reduces how often one hits mid-run.
+PER_COIN_DELAY_SECONDS = 1.5
+
 DATA_DIR = "data"
 HISTORY_DIR = f"{DATA_DIR}/history"
 WATCHLIST_PATH = f"{DATA_DIR}/watchlist.json"
