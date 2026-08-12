@@ -1,8 +1,11 @@
 {
-  "date": "2026-08-11",
+  "date": "2026-08-12",
   "records": [],
   "pipeline_errors": {},
   "discovery_errors": {
+    "arbitrum:trending": "429 Client Error: Too Many Requests for url: https://api.geckoterminal.com/api/v2/networks/arbitrum/trending_pools?page=1",
+    "polygon_pos:new": "429 Client Error: Too Many Requests for url: https://api.geckoterminal.com/api/v2/networks/polygon_pos/new_pools?page=1",
+    "polygon_pos:trending": "429 Client Error: Too Many Requests for url: https://api.geckoterminal.com/api/v2/networks/polygon_pos/trending_pools?page=1",
     "bsc:new": "429 Client Error: Too Many Requests for url: https://api.geckoterminal.com/api/v2/networks/bsc/new_pools?page=1",
     "bsc:trending": "429 Client Error: Too Many Requests for url: https://api.geckoterminal.com/api/v2/networks/bsc/trending_pools?page=1"
   }
