@@ -1,9 +1,5 @@
 [
   {
-    "total_market_cap_usd": 0.0,
-    "date": "2026-08-15"
-  },
-  {
     "total_market_cap_usd": 31507090387.021152,
     "date": "2026-08-16"
   },
@@ -358,5 +354,9 @@
   {
     "total_market_cap_usd": 30737862257.626564,
     "date": "2026-11-12"
+  },
+  {
+    "total_market_cap_usd": 31641896047.128273,
+    "date": "2026-11-13"
   }
 ]
